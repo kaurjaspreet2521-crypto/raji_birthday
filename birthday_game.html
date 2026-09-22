@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raji's Birthday Cake Catcher</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    h1 {
+      color: #ff75a0;
+      margin-bottom: 5px;
+      font-size: 2rem;
+      text-shadow: 0 0 10px rgba(255, 117, 160, 0.5);
+    }
+
+    .instructions {
+      color: #e0e0e0;
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
+
+    #game-container {
+      position: relative;
+      width: 400px;
+      height: 500px;
+      background-color: #0f3460;
+      border: 4px solid #ff75a0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .score-board {
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      right: 15px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.1rem;
+      font-weight: bold;
+      z-index: 10;
+    }
+
+    /* Player Basket */
+    #basket {
+      position: absolute;
+      bottom: 10px;
+      left: 160px;
+      width: 80px;
+      height: 25px;
+      background: #ff4081;
+      border-radius: 0 0 15px 15px;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      line-height: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    /* Falling Items */
+    .cake-item {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      font-size: 24px;
+      line-height: 30px;
+      text-align: center;
+    }
+
+    /* Overlay Screens */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 52, 96, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+    }
+
+    .overlay h2 {
+      font-size: 2rem;
+      color: #ff75a0;
+      margin-bottom: 10px;
+    }
+
+    .overlay p {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background: #ff4081;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .btn:hover {
+      background: #ff75a0;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎂 Happy Birthday, Raji! 🎉</h1>
+  <p class="instructions">Use <strong>Left / Right Arrow keys</strong> or <strong>Mouse</strong> to move the basket.</p>
+
+  <div id="game-container">
+    <div class="score-board">
+      <div>Score: <span id="score">0</span></div>
+      <div>Lives: <span id="lives">3</span></div>
+    </div>
+
+    <div id="basket">RAJI</div>
+
+    <!-- Start Overlay -->
+    <div id="start-screen" class="overlay">
+      <h2>Ready, Raji?</h2>
+      <p>Catch as many cakes as you can!</p>
+      <button class="btn" onclick="startGame()">Start Game</button>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="game-over-screen" class="overlay" style="display: none;">
+      <h2>Game Over!</h2>
+      <p>Awesome job, Raji! Final Score: <span id="final-score">0</span></p>
+      <button class="btn" onclick="startGame()">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById('game-container');
+    const basket = document.getElementById('basket');
+    const scoreDisplay = document.getElementById('score');
+    const livesDisplay = document.getElementById('lives');
+    const finalScoreDisplay = document.getElementById('final-score');
+    const startScreen = document.getElementById('start-screen');
+    const gameOverScreen = document.getElementById('game-over-screen');
+
+    const containerWidth = 400;
+    const basketWidth = 80;
+
+    let basketX = 160;
+    let score = 0;
+    let lives = 3;
+    let gameInterval = null;
+    let spawnInterval = null;
+    let isPlaying = false;
+    let activeCakes = [];
+    let dropSpeed = 3;
+
+    // Movement Controls (Keyboard)
+    document.addEventListener('keydown', (e) => {
+      if (!isPlaying) return;
+      if (e.key === 'ArrowLeft' && basketX > 0) {
+        basketX -= 25;
+      } else if (e.key === 'ArrowRight' && basketX < containerWidth - basketWidth) {
+        basketX += 25;
+      }
+      basket.style.left = basketX + 'px';
+    });
+
+    // Movement Controls (Mouse / Touch)
+    container.addEventListener('mousemove', (e) => {
+      if (!isPlaying) return;
+      const rect = container.getBoundingClientRect();
+      let mouseX = e.clientX - rect.left - basketWidth / 2;
+      
+      // Keep basket inside boundaries
+      if (mouseX < 0) mouseX = 0;
+      if (mouseX > containerWidth - basketWidth) mouseX = containerWidth - basketWidth;
+      
+      basketX = mouseX;
+      basket.style.left = basketX + 'px';
+    });
+
+    function startGame() {
+      // Reset variables
+      score = 0;
+      lives = 3;
+      dropSpeed = 3;
+      basketX = 160;
+      basket.style.left = basketX + 'px';
+      scoreDisplay.textContent = score;
+      livesDisplay.textContent = lives;
+
+      // Clear remaining cakes
+      activeCakes.forEach(c => c.element.remove());
+      activeCakes = [];
+
+      // Hide screens
+      startScreen.style.display = 'none';
+      gameOverScreen.style.display = 'none';
+
+      isPlaying = true;
+
+      // Game loops
+      gameInterval = setInterval(updateGame, 1000 / 60); // 60 FPS
+      spawnInterval = setInterval(spawnCake, 1000);
+    }
+
+    function spawnCake() {
+      if (!isPlaying) return;
+
+      const cakeElem = document.createElement('div');
+      cakeElem.classList.add('cake-item');
+      cakeElem.textContent = '🍰';
+
+      const startX = Math.floor(Math.random() * (containerWidth - 30));
+      cakeElem.style.left = startX + 'px';
+      cakeElem.style.top = '0px';
+
+      container.appendChild(cakeElem);
+
+      activeCakes.push({
+        element: cakeElem,
+        x: startX,
+        y: 0
+      });
+    }
+
+    function updateGame() {
+      // Increase speed as score grows
+      dropSpeed = 3 + Math.floor(score / 5) * 0.5;
+
+      for (let i = activeCakes.length - 1; i >= 0; i--) {
+        let cake = activeCakes[i];
+        cake.y += dropSpeed;
+        cake.element.style.top = cake.y + 'px';
+
+        // Collision Check with Basket
+        if (
+          cake.y >= 450 && cake.y <= 475 &&
+          cake.x + 30 >= basketX && cake.x <= basketX + basketWidth
+        ) {
+          score += 1;
+          scoreDisplay.textContent = score;
+          cake.element.remove();
+          activeCakes.splice(i, 1);
+          continue;
+        }
+
+        // Missed Cake
+        if (cake.y > 500) {
+          lives -= 1;
+          livesDisplay.textContent = lives;
+          cake.element.remove();
+          activeCakes.splice(i, 1);
+
+          if (lives <= 0) {
+            endGame();
+          }
+        }
+      }
+    }
+
+    function endGame() {
+      isPlaying = false;
+      clearInterval(gameInterval);
+      clearInterval(spawnInterval);
+
+      finalScoreDisplay.textContent = score;
+      gameOverScreen.style.display = 'flex';
+    }
+  </script>
+
+<p> Heyy i have one more thing for uhh :<a href="card.html" class="back-link">wanna see?</a><br><br>
+<a href="index.html" class="back-link">← Back to Main Page</a>
+
+</body>
+</html>

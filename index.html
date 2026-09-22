@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Birthday Cake</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h1 {
+      color: #ff75a0;
+      font-size: 2.5rem;
+      margin-bottom: 40px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(255, 117, 160, 0.5);
+    }
+
+    /* Cake Base Structure */
+    .cake {
+      position: relative;
+      width: 250px;
+      height: 200px;
+      margin: 0 auto;
+    }
+
+    /* Cake Layers */
+    .plate {
+      position: absolute;
+      bottom: -10px;
+      left: -25px;
+      width: 300px;
+      height: 15px;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .layer-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 10px;
+      width: 230px;
+      height: 70px;
+      background: #6d4c41;
+      border-radius: 10px 10px 0 0;
+      box-shadow: inset 0 -10px 0 #4e342e;
+    }
+
+    .layer-middle {
+      position: absolute;
+      bottom: 60px;
+      left: 25px;
+      width: 200px;
+      height: 60px;
+      background: #ff80ab;
+      border-radius: 10px 10px 0 0;
+      box-shadow: inset 0 -10px 0 #ff4081;
+    }
+
+    .layer-top {
+      position: absolute;
+      bottom: 110px;
+      left: 40px;
+      width: 170px;
+      height: 50px;
+      background: #fff8e1;
+      border-radius: 10px 10px 0 0;
+    }
+
+    /* Frosting Drips */
+    .frosting {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 15px;
+      background-color: #ff4081;
+      border-radius: 10px 10px 0 0;
+    }
+
+    /* Candle Structure */
+    .candle {
+      position: absolute;
+      bottom: 160px;
+      left: 115px;
+      width: 20px;
+      height: 50px;
+      background: repeating-linear-gradient(
+        45deg,
+        #ffeb3b,
+        #ffeb3b 5px,
+        #00e676 5px,
+        #00e676 10px
+      );
+      border-radius: 3px 3px 0 0;
+    }
+
+    .wick {
+      position: absolute;
+      top: -10px;
+      left: 9px;
+      width: 2px;
+      height: 10px;
+      background-color: #424242;
+    }
+
+    /* Animated Flame */
+    .flame {
+      position: absolute;
+      top: -28px;
+      left: 2px;
+      width: 16px;
+      height: 24px;
+      background-color: #ff9800;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      transform-origin: center bottom;
+      animation: flicker 1.2s infinite alternate ease-in-out;
+      box-shadow: 0 0 20px #ff9800, 0 0 40px #ff5722;
+    }
+
+    .flame-inner {
+      position: absolute;
+      top: 6px;
+      left: 3px;
+      width: 10px;
+      height: 14px;
+      background-color: #ffeb3b;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    }
+
+    /* Flame Keyframe Animation */
+    @keyframes flicker {
+      0% {
+        transform: scale(1) rotate(-2deg);
+        opacity: 0.9;
+      }
+      20% {
+        transform: scale(1.05) rotate(2deg);
+        opacity: 1;
+      }
+      40% {
+        transform: scale(0.95) rotate(-1deg);
+        opacity: 0.8;
+      }
+      60% {
+        transform: scale(1.1) rotate(1deg);
+        opacity: 1;
+      }
+      80% {
+        transform: scale(0.98) rotate(-2deg);
+        opacity: 0.9;
+      }
+      100% {
+        transform: scale(1.02) rotate(2deg);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Happy Birthday Raji !</h1>
+    
+    <div class="cake">
+      <!-- Candle -->
+      <div class="candle">
+        <div class="wick"></div>
+        <div class="flame">
+          <div class="flame-inner"></div>
+        </div>
+      </div>
+
+      <!-- Cake Body -->
+      <div class="layer-top">
+        <div class="frosting"></div>
+      </div>
+      <div class="layer-middle"></div>
+      <div class="layer-bottom"></div>
+      <div class="plate"></div>
+    </div>
+  </div>
+<p> Here is something for uhh moti<a href="birthday_game.html" class="back-link">tap here </a>
+</body>
+</html>
